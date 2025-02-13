@@ -66,7 +66,7 @@ class ObjectConstraint extends Constraint
                 continue;
             }
             foreach ($element as $i => $value) {
-                if (preg_match($fullRegex, $i)) {
+                if (preg_match($fullRegex, (string) $i)) {
                     $matches[] = $i;
                     $this->checkUndefined($value, $schema ?: new \stdClass(), $path, $i, in_array($i, $this->appliedDefaults));
                 }
