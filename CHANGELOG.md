@@ -6,18 +6,132 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- UriRetriever: Include actual media type in InvalidSchemaMediaTypeException message ([#872](https://github.com/jsonrainbow/json-schema/pull/872))
+- docs: Correct trailing spaces in Markdown ([#873](https://github.com/jsonrainbow/json-schema/pull/873))
+
+### Added
+- Automate changelog updates on PR merge ([#874](https://github.com/jsonrainbow/json-schema/pull/874))
+
+### Changed
+- Fix welcome workflow permission errors from forked PRs ([#875](https://github.com/jsonrainbow/json-schema/pull/875))
+
+## [6.6.4] - 2025-12-19
+### Changed
+- ci: Run workflows against 5.x.x branches ([#859](https://github.com/jsonrainbow/json-schema/pull/859))
+### Fixed
+- UriValidator: Allow `file:/` and `file:///` ([#856](https://github.com/jsonrainbow/json-schema/discussions/856))
+- Fix .php-cs-fixer.dist.php export-ignore ([#861](https://github.com/jsonrainbow/json-schema/discussions/861))
+
+## [6.6.3] - 2025-12-02
+### Changed
+- Restricted `mark-mabe/php-enum` dependency to `^4.4` due to lower versions emitting a warning on PHP 8 ([#854](https://github.com/jsonrainbow/json-schema/pull/854))
+
+## [6.6.2] - 2025-11-28
+### Changed
+- Move PHP 8.5 to default add PHP 8.6 as experimental ([#852](https://github.com/jsonrainbow/json-schema/pull/852))
+### Fixed
+- Allow underscore and tilde in URI hostnames as per RFC 3986 ([#853](https://github.com/jsonrainbow/json-schema/pull/853))
+
+## [6.6.1] - 2025-11-07
+### Changed
+- Rename master to main ([#848](https://github.com/jsonrainbow/json-schema/pull/848))
+### Fixed
+- Don't skip ref expanding for property called enum when child of property called properties ([#851](https://github.com/jsonrainbow/json-schema/pull/851))
+
+## [6.6.0] - 2025-10-10
+### Added
+- Add lint check for class autoloading PSR compliance ([#845](https://github.com/jsonrainbow/json-schema/pull/845))
+- add implementation for strict fully validating using draft-06 schema ([#843](https://github.com/jsonrainbow/json-schema/pull/835))
+
+## [6.5.2] - 2025-09-09
+### Fixed
+- Fix issue when http headers are already present ([#843](https://github.com/jsonrainbow/json-schema/pull/843))
+
+## [6.5.1] - 2025-08-29
+### Changed
+- ci: Add PHP 8.5 to pipeline, ignoring dependencies and as experimental ([#842](https://github.com/jsonrainbow/json-schema/pull/842))
+
+## [6.5.0] - 2025-08-29
+### Changed
+- Update test case to current (PHP) standards ([#831](https://github.com/jsonrainbow/json-schema/pull/831))
+- Upgrade test suite to use generators ([#834](https://github.com/jsonrainbow/json-schema/pull/834))
+- update to latest json schema test suite ([#821](https://github.com/jsonrainbow/json-schema/pull/821))
+### Fixed
+- Fix PHP 8.5 $http_response_header deprecation ([#840](https://github.com/jsonrainbow/json-schema/pull/840))
+
+## [6.4.2] - 2025-06-03
+### Fixed
+- Fix objects are non-unique despite key order ([#819](https://github.com/jsonrainbow/json-schema/pull/819))
+- Id's not being resolved and id property affects sibling ref which it should not do ([#828](https://github.com/jsonrainbow/json-schema/pull/828))
+
+### Changed
+- Added extra breaking change to UPDATE-6.0.md regarding BaseConstraint::addError signature change ([#823](https://github.com/jsonrainbow/json-schema/pull/823))
+- Update constraint class to PHP 7.2 language level ([#824](https://github.com/jsonrainbow/json-schema/pull/824))
+- Update base constraint class to PHP 7.2 language level ([#826](https://github.com/jsonrainbow/json-schema/pull/826))
+
+### Added
+- Introduce 32 bits CI workflow on latest php version ([#825](https://github.com/jsonrainbow/json-schema/pull/825))
+
+## [6.4.1] - 2025-04-04
+### Fixed
+- Fix support for 32bits PHP ([#817](https://github.com/jsonrainbow/json-schema/pull/817))
+
+## [6.4.0] - 2025-04-01
+### Added
+- Run PHPStan using the lowest and highest php version ([#811](https://github.com/jsonrainbow/json-schema/pull/811))
+### Fixed
+- Use parallel-lint and cs2pr for improved feedback on linting errors ([#812](https://github.com/jsonrainbow/json-schema/pull/812))
+- Array with number values with mathematical equality are considered valid ([#813](https://github.com/jsonrainbow/json-schema/pull/813))
+### Changed
+- Correct PHPStan findings in validator ([#808](https://github.com/jsonrainbow/json-schema/pull/808))
+- Add cs2pr handling for php-cs-fixer; avoid doing composer install ([#814](https://github.com/jsonrainbow/json-schema/pull/814))
+- prepare PHP 8.5 in CI ([#815](https://github.com/jsonrainbow/json-schema/pull/815))
+
+## [6.3.1] - 2025-03-18
+### Fixed
+- ensure numeric issues in const are correctly evaluated ([#805](https://github.com/jsonrainbow/json-schema/pull/805))
+- fix 6.3.0 regression with comparison of null values during validation ([#806](https://github.com/jsonrainbow/json-schema/issues/806))
+
+## [6.3.0] - 2025-03-14
+### Fixed
+- only check minProperties or maxProperties on objects ([#802](https://github.com/jsonrainbow/json-schema/pull/802))
+- replace filter_var for uri and uri-reference to userland code to be RFC 3986 compliant ([#800](https://github.com/jsonrainbow/json-schema/pull/800))
+- avoid duplicate workflow runs ([#804](https://github.com/jsonrainbow/json-schema/pull/804))
+
+## Changed
+- replace icecave/parity with custom deep comparator ([#803](https://github.com/jsonrainbow/json-schema/pull/803))
+
+## [6.2.1] - 2025-03-06
+### Fixed
+- allow items: true to pass validation ([#801](https://github.com/jsonrainbow/json-schema/pull/801))
+
+### Changed
+- Include actual count in collection constraint errors ([#797](https://github.com/jsonrainbow/json-schema/pull/797))
+
+## [6.2.0] - 2025-02-26
 ### Added
 - Welcome first time contributors ([#782](https://github.com/jsonrainbow/json-schema/pull/782))
+
+### Fixed
+- Add required permissions for welcome action ([#789](https://github.com/jsonrainbow/json-schema/pull/789))
+- Upgrade php cs fixer to latest ([#783](https://github.com/jsonrainbow/json-schema/pull/783))
+- Create deep copy before checking each sub schema in oneOf ([#791](https://github.com/jsonrainbow/json-schema/pull/791))
+- Create deep copy before checking each sub schema in anyOf ([#792](https://github.com/jsonrainbow/json-schema/pull/792))
+- Correctly set the schema ID when passing it as assoc array ([#794](https://github.com/jsonrainbow/json-schema/pull/794))
+- Create deep copy before checking each sub schema in oneOf when only check_mode_apply_defaults is set ([#795](https://github.com/jsonrainbow/json-schema/pull/795))
+- Additional property casted into int when actually is numeric string ([#784](https://github.com/jsonrainbow/json-schema/pull/784))
 
 ### Changed
 - Used PHPStan's int-mask-of<T> type where applicable ([#779](https://github.com/jsonrainbow/json-schema/pull/779))
 - Fixed some PHPStan errors ([#781](https://github.com/jsonrainbow/json-schema/pull/781))
+- Cleanup redundant checks ([#796](https://github.com/jsonrainbow/json-schema/pull/796))
 
 ## [6.1.0] - 2025-02-04
 ### Added
 - Add return types in the test suite ([#748](https://github.com/jsonrainbow/json-schema/pull/748))
 - Add test case for validating array of strings with objects ([#704](https://github.com/jsonrainbow/json-schema/pull/704))
-- Add contributing information, contributor recognition and security information ([#771](https://github.com/jsonrainbow/json-schema/pull/771)) 
+- Add contributing information, contributor recognition and security information ([#771](https://github.com/jsonrainbow/json-schema/pull/771))
 
 ### Fixed
 - Correct misconfigured mocks in JsonSchema\Tests\Uri\UriRetrieverTest ([#741](https://github.com/jsonrainbow/json-schema/pull/741))

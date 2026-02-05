@@ -1,14 +1,10 @@
 <?php
 
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace JsonSchema\Tests;
 
+use JsonSchema\DraftIdentifiers;
 use JsonSchema\SchemaStorage;
 use JsonSchema\Uri\UriRetriever;
 use JsonSchema\Validator;
@@ -21,7 +17,7 @@ class SchemaStorageTest extends TestCase
         $mainSchema = $this->getMainSchema();
         $mainSchemaPath = 'http://www.example.com/schema.json';
 
-        $uriRetriever = $this->prophesize('JsonSchema\UriRetrieverInterface');
+        $uriRetriever = $this->prophesize(\JsonSchema\UriRetrieverInterface::class);
         $uriRetriever->retrieve($mainSchemaPath)->willReturn($mainSchema)->shouldBeCalled();
 
         $schemaStorage = new SchemaStorage($uriRetriever->reveal());
@@ -55,7 +51,7 @@ class SchemaStorageTest extends TestCase
         $schema3Path = 'http://www.my-domain.com/schema3.json';
 
         /** @var UriRetriever $uriRetriever */
-        $uriRetriever = $this->prophesize('JsonSchema\UriRetrieverInterface');
+        $uriRetriever = $this->prophesize(\JsonSchema\UriRetrieverInterface::class);
         $uriRetriever->retrieve($mainSchemaPath)->willReturn($mainSchema)->shouldBeCalled();
         $uriRetriever->retrieve($schema2Path)->willReturn($schema2)->shouldBeCalled();
         $uriRetriever->retrieve($schema3Path)->willReturn($schema3)->shouldBeCalled();
@@ -102,13 +98,13 @@ class SchemaStorageTest extends TestCase
 
     public function testUnresolvableJsonPointExceptionShouldBeThrown(): void
     {
-        $this->expectException('JsonSchema\Exception\UnresolvableJsonPointerException');
+        $this->expectException(\JsonSchema\Exception\UnresolvableJsonPointerException::class);
         $this->expectExceptionMessage('File: http://www.example.com/schema.json is found, but could not resolve fragment: #/definitions/car');
 
         $mainSchema = $this->getInvalidSchema();
         $mainSchemaPath = 'http://www.example.com/schema.json';
 
-        $uriRetriever = $this->prophesize('JsonSchema\UriRetrieverInterface');
+        $uriRetriever = $this->prophesize(\JsonSchema\UriRetrieverInterface::class);
         $uriRetriever->retrieve($mainSchemaPath)
             ->willReturn($mainSchema)
             ->shouldBeCalled();
@@ -119,7 +115,7 @@ class SchemaStorageTest extends TestCase
 
     public function testResolveRefWithNoAssociatedFileName(): void
     {
-        $this->expectException('JsonSchema\Exception\UnresolvableJsonPointerException');
+        $this->expectException(\JsonSchema\Exception\UnresolvableJsonPointerException::class);
         $this->expectExceptionMessage("Could not resolve fragment '#': no file is defined");
 
         $schemaStorage = new SchemaStorage();
@@ -130,7 +126,7 @@ class SchemaStorageTest extends TestCase
     {
         return (object) [
             'version' => 'v1',
-            '$schema' => 'http://json-schema.org/draft-04/schema#',
+            '$schema' => DraftIdentifiers::DRAFT_4,
             'id' => 'http://www.example.com/schema.json',
             'type' => 'object',
             'additionalProperties' => true,
@@ -189,7 +185,7 @@ class SchemaStorageTest extends TestCase
     {
         return (object) [
             'version' => 'v1',
-            '$schema' => 'http://json-schema.org/draft-04/schema#',
+            '$schema' => DraftIdentifiers::DRAFT_4,
             'id' => 'http://www.my-domain.com/schema2.json',
             'definitions' => (object) [
                 'car' => (object) [
@@ -216,7 +212,7 @@ class SchemaStorageTest extends TestCase
     {
         return (object) [
             'version' => 'v1',
-            '$schema' => 'http://json-schema.org/draft-04/schema#',
+            '$schema' => DraftIdentifiers::DRAFT_4,
             'title' => 'wheel',
             'wheel' => (object) [
                 'properties' => (object) [
@@ -238,7 +234,7 @@ class SchemaStorageTest extends TestCase
     {
         return (object) [
             'version' => 'v1',
-            '$schema' => 'http://json-schema.org/draft-04/schema#',
+            '$schema' => DraftIdentifiers::DRAFT_4,
             'type' => 'object',
             'properties' => (object) [
                 'spokes' => (object) [
@@ -263,24 +259,24 @@ class SchemaStorageTest extends TestCase
     public function testGetUriRetriever(): void
     {
         $s = new SchemaStorage();
-        $s->addSchema('http://json-schema.org/draft-04/schema#');
-        $this->assertInstanceOf('\JsonSchema\Uri\UriRetriever', $s->getUriRetriever());
+        $s->addSchema(DraftIdentifiers::DRAFT_4);
+        $this->assertInstanceOf(\JsonSchema\Uri\UriRetriever::class, $s->getUriRetriever());
     }
 
     public function testGetUriResolver(): void
     {
         $s = new SchemaStorage();
-        $s->addSchema('http://json-schema.org/draft-04/schema#');
-        $this->assertInstanceOf('\JsonSchema\Uri\UriResolver', $s->getUriResolver());
+        $s->addSchema(DraftIdentifiers::DRAFT_4);
+        $this->assertInstanceOf(\JsonSchema\Uri\UriResolver::class, $s->getUriResolver());
     }
 
     public function testMetaSchemaFixes(): void
     {
         $s = new SchemaStorage();
-        $s->addSchema('http://json-schema.org/draft-03/schema#');
-        $s->addSchema('http://json-schema.org/draft-04/schema#');
-        $draft_03 = $s->getSchema('http://json-schema.org/draft-03/schema#');
-        $draft_04 = $s->getSchema('http://json-schema.org/draft-04/schema#');
+        $s->addSchema(DraftIdentifiers::DRAFT_3);
+        $s->addSchema(DraftIdentifiers::DRAFT_4);
+        $draft_03 = $s->getSchema(DraftIdentifiers::DRAFT_3);
+        $draft_04 = $s->getSchema(DraftIdentifiers::DRAFT_4);
 
         $this->assertEquals('uri-reference', $draft_03->properties->id->format);
         $this->assertEquals('uri-reference', $draft_03->properties->{'$ref'}->format);
@@ -291,15 +287,17 @@ class SchemaStorageTest extends TestCase
     {
         $schemaOne = json_decode('{"id": "test/schema", "$ref": "../test2/schema2"}');
 
-        $uriRetriever = $this->prophesize('JsonSchema\UriRetrieverInterface');
+        $uriRetriever = $this->prophesize(\JsonSchema\UriRetrieverInterface::class);
         $uriRetriever->retrieve('test/schema')->willReturn($schemaOne)->shouldBeCalled();
 
         $s = new SchemaStorage($uriRetriever->reveal());
-        $schema = $s->addSchema('test/schema');
+        $s->addSchema('test/schema');
 
         $r = new \ReflectionObject($s);
         $p = $r->getProperty('schemas');
-        $p->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $p->setAccessible(true);
+        }
         $schemas = $p->getValue($s);
 
         $this->assertEquals(

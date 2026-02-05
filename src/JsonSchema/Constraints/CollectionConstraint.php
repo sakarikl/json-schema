@@ -13,6 +13,7 @@ namespace JsonSchema\Constraints;
 
 use JsonSchema\ConstraintError;
 use JsonSchema\Entity\JsonPointer;
+use JsonSchema\Tool\DeepComparer;
 
 /**
  * The CollectionConstraint Constraints, validates an array against a given schema
@@ -29,31 +30,28 @@ class CollectionConstraint extends Constraint
     {
         // Verify minItems
         if (isset($schema->minItems) && count($value) < $schema->minItems) {
-            $this->addError(ConstraintError::MIN_ITEMS(), $path, ['minItems' => $schema->minItems]);
+            $this->addError(ConstraintError::MIN_ITEMS(), $path, ['minItems' => $schema->minItems, 'found' => count($value)]);
         }
 
         // Verify maxItems
         if (isset($schema->maxItems) && count($value) > $schema->maxItems) {
-            $this->addError(ConstraintError::MAX_ITEMS(), $path, ['maxItems' => $schema->maxItems]);
+            $this->addError(ConstraintError::MAX_ITEMS(), $path, ['maxItems' => $schema->maxItems, 'found' => count($value)]);
         }
 
         // Verify uniqueItems
         if (isset($schema->uniqueItems) && $schema->uniqueItems) {
-            $unique = $value;
-            if (is_array($value) && count($value)) {
-                $unique = array_map(function ($e) {
-                    return var_export($e, true);
-                }, $value);
-            }
-            if (count(array_unique($unique)) != count($value)) {
-                $this->addError(ConstraintError::UNIQUE_ITEMS(), $path);
+            $count = count($value);
+            for ($x = 0; $x < $count - 1; $x++) {
+                for ($y = $x + 1; $y < $count; $y++) {
+                    if (DeepComparer::isEqual($value[$x], $value[$y])) {
+                        $this->addError(ConstraintError::UNIQUE_ITEMS(), $path);
+                        break 2;
+                    }
+                }
             }
         }
 
-        // Verify items
-        if (isset($schema->items)) {
-            $this->validateItems($value, $schema, $path, $i);
-        }
+        $this->validateItems($value, $schema, $path, $i);
     }
 
     /**
@@ -65,6 +63,14 @@ class CollectionConstraint extends Constraint
      */
     protected function validateItems(&$value, $schema = null, ?JsonPointer $path = null, $i = null): void
     {
+        if (\is_null($schema) || !isset($schema->items)) {
+            return;
+        }
+
+        if ($schema->items === true) {
+            return;
+        }
+
         if (is_object($schema->items)) {
             // just one type definition for the whole array
             foreach ($value as $k => &$v) {

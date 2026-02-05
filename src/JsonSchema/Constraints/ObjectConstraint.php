@@ -2,37 +2,32 @@
 
 declare(strict_types=1);
 
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Constraints;
 
 use JsonSchema\ConstraintError;
 use JsonSchema\Entity\JsonPointer;
 
-/**
- * The ObjectConstraint Constraints, validates an object against a given schema
- *
- * @author Robert Schönthal <seroscho@googlemail.com>
- * @author Bruno Prieto Reis <bruno.p.reis@gmail.com>
- */
 class ObjectConstraint extends Constraint
 {
     /**
-     * @var array List of properties to which a default value has been applied
+     * @var list<string> List of properties to which a default value has been applied
      */
     protected $appliedDefaults = [];
 
     /**
      * {@inheritdoc}
+     *
+     * @param list<string> $appliedDefaults
      */
-    public function check(&$element, $schema = null, ?JsonPointer $path = null, $properties = null,
-        $additionalProp = null, $patternProperties = null, $appliedDefaults = []): void
-    {
+    public function check(
+        &$element,
+        $schema = null,
+        ?JsonPointer $path = null,
+        $properties = null,
+        $additionalProp = null,
+        $patternProperties = null,
+        $appliedDefaults = []
+    ): void {
         if ($element instanceof UndefinedConstraint) {
             return;
         }
@@ -159,7 +154,7 @@ class ObjectConstraint extends Constraint
     {
         if (is_array($element) && (isset($element[$property]) || array_key_exists($property, $element)) /*$this->checkMode == self::CHECK_MODE_TYPE_CAST*/) {
             return $element[$property];
-        } elseif (is_object($element) && property_exists($element, $property)) {
+        } elseif (is_object($element) && property_exists($element, (string) $property)) {
             return $element->$property;
         }
 
@@ -175,15 +170,19 @@ class ObjectConstraint extends Constraint
      */
     protected function validateMinMaxConstraint($element, $objectDefinition, ?JsonPointer $path = null)
     {
+        if (!$this->getTypeCheck()::isObject($element)) {
+            return;
+        }
+
         // Verify minimum number of properties
-        if (isset($objectDefinition->minProperties) && !is_object($objectDefinition->minProperties)) {
-            if ($this->getTypeCheck()->propertyCount($element) < $objectDefinition->minProperties) {
+        if (isset($objectDefinition->minProperties) && is_int($objectDefinition->minProperties)) {
+            if ($this->getTypeCheck()->propertyCount($element) < max(0, $objectDefinition->minProperties)) {
                 $this->addError(ConstraintError::PROPERTIES_MIN(), $path, ['minProperties' => $objectDefinition->minProperties]);
             }
         }
         // Verify maximum number of properties
-        if (isset($objectDefinition->maxProperties) && !is_object($objectDefinition->maxProperties)) {
-            if ($this->getTypeCheck()->propertyCount($element) > $objectDefinition->maxProperties) {
+        if (isset($objectDefinition->maxProperties) && is_int($objectDefinition->maxProperties)) {
+            if ($this->getTypeCheck()->propertyCount($element) > max(0, $objectDefinition->maxProperties)) {
                 $this->addError(ConstraintError::PROPERTIES_MAX(), $path, ['maxProperties' => $objectDefinition->maxProperties]);
             }
         }

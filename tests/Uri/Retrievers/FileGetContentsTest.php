@@ -1,13 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JsonSchema\Tests\Uri\Retrievers;
 
 use JsonSchema\Uri\Retrievers\FileGetContents;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group FileGetContents
- */
 class FileGetContentsTest extends TestCase
 {
     public function testFetchMissingFile(): void
@@ -32,7 +31,9 @@ class FileGetContentsTest extends TestCase
 
         $reflector = new \ReflectionObject($res);
         $fetchContentType = $reflector->getMethod('fetchContentType');
-        $fetchContentType->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $fetchContentType->setAccessible(true);
+        }
 
         $this->assertTrue($fetchContentType->invoke($res, ['Content-Type: application/json']));
         $this->assertFalse($fetchContentType->invoke($res, ['X-Some-Header: whateverValue']));

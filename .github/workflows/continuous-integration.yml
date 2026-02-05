@@ -3,50 +3,34 @@ name: "Continuous Integration"
 on:
   push:
     branches:
-      - master
+      - main
+      - 5.x.x
   pull_request:
     branches:
-      - master
+      - main
+      - 5.x.x
 
 env:
   COMPOSER_FLAGS: "--ansi --no-interaction --no-progress --prefer-dist"
 
 jobs:
   tests:
-    name: "CI"
+    name: "PHP ${{ matrix.php-version }}, ${{ matrix.dependencies }} dependecies, experimental: ${{ matrix.experimental || false}}"
 
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: ${{ matrix.experimental || false }}
 
     strategy:
+      fail-fast: false
       matrix:
-        php-version:
-          - "7.2"
-          - "7.3"
-          - "7.4"
-          - "8.0"
-          - "8.1"
-          - "8.2"
-          - "8.3"
-          - "8.4"
+        php-version: [ '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
         dependencies: [highest]
-        experimental: [false]
         include:
           - php-version: "7.2"
-            dependencies: highest
-            experimental: false
-          - php-version: "7.2"
             dependencies: lowest
-            experimental: false
-#          - php-version: "8.0"
-#            dependencies: highest
-#            experimental: false
-#          - php-version: "8.1"
-#            dependencies: lowest-ignore
-#            experimental: true
-#          - php-version: "8.1"
-#            dependencies: highest-ignore
-#            experimental: true
+          - php-version: "8.6"
+            dependencies: ignore
+            experimental: true
 
     steps:
       - name: "Checkout"
@@ -75,7 +59,8 @@ jobs:
       - name: "Validate composer.json"
         run: "composer validate"
 
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
       - name: "Run tests"
         run: "composer test"
-
-

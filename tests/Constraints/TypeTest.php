@@ -1,11 +1,6 @@
 <?php
 
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace JsonSchema\Tests\Constraints;
 
@@ -13,13 +8,6 @@ use JsonSchema\Constraints\TypeCheck\LooseTypeCheck;
 use JsonSchema\Constraints\TypeConstraint;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Class TypeTest
- *
- * @package JsonSchema\Tests\Constraints
- *
- * @author hakre <https://github.com/hakre>
- */
 class TypeTest extends TestCase
 {
     /**
@@ -108,7 +96,9 @@ class TypeTest extends TestCase
         $t = new TypeConstraint();
         $r = new \ReflectionObject($t);
         $m = $r->getMethod('validateTypeNameWording');
-        $m->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $m->setAccessible(true);
+        }
 
         $m->invoke($t, $nameWording);
         $this->expectNotToPerformAssertions();
@@ -119,7 +109,9 @@ class TypeTest extends TestCase
         $t = new TypeConstraint();
         $r = new \ReflectionObject($t);
         $m = $r->getMethod('validateTypeNameWording');
-        $m->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $m->setAccessible(true);
+        }
 
         $this->expectException('\UnexpectedValueException');
         $this->expectExceptionMessage("No wording for 'notAValidTypeName' available, expected wordings are: [an integer, a number, a boolean, an object, an array, a string, a null]");
@@ -133,7 +125,7 @@ class TypeTest extends TestCase
         $data = new \stdClass();
         $schema = json_decode('{"type": "notAValidTypeName"}');
 
-        $this->expectException('JsonSchema\Exception\InvalidArgumentException');
+        $this->expectException(\JsonSchema\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('object is an invalid type for notAValidTypeName');
 
         $t->check($data, $schema);
